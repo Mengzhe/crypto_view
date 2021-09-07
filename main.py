@@ -65,7 +65,7 @@ delta = datetime.timedelta(hours=4) ## timezone difference
 ## https://min-api.cryptocompare.com/documentation/websockets?key=Channels&cat=AggregateIndex
 async def cryptocompare():
     # this is where you paste your api key
-    api_key = "25295cd57506ec0833859aa379e1a0903db45af18861af15101a6e4b8354ce6b"
+    api_key = "this is where you paste your api key"
     url = "wss://streamer.cryptocompare.com/v2?api_key=" + api_key
     async with websockets.connect(url) as websocket:
         await websocket.send(json.dumps({
