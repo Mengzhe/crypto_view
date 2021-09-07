@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <title>History</title>
+</head>
+<body>
+<div id="chart_history">
+</div>
+</body>
+<script>
+    const chart = LightweightCharts.createChart(document.getElementById("chart_history"),
+    {width: 1000,
+     height: 500,
+     timeScale: {
+		timeVisible: true,
+        secondsVisible: true,
+	},
+    });
+const lineSeries = chart.addLineSeries();
+
+fetch('http://localhost:8000/history')
+    .then((response) => response.json())
+    .then((response) => {
+        console.log(response)
+        lineSeries.setData(response);
+})
+</script>
+</html>

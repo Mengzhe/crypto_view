@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <title>Real-Time BTC Price</title>
+</head>
+<body>
+<div id="trades">
+    <div>
+        <span> Real-Time BTC Price: </span>
+        <span id="rt_price"> </span>
+    </div>
+    <div>
+        <span> Aggregated Median Price: </span>
+        <span id="rt_median"> </span>
+    </div>
+    <div>
+        <span> Timestamp: </span>
+        <span id="timestamp"> </span>
+    </div>
+</div>
+<div id="chart"></div>
+</body>
+<script>
+    const chart = LightweightCharts.createChart(document.getElementById("chart"),
+    {width: 1000,
+     height: 500,
+     timeScale: {
+		timeVisible: true,
+        secondsVisible: true,
+	},
+    });
+const lineSeries = chart.addLineSeries();
+var ws = new WebSocket("ws://localhost:8000/ws");
+
+var tradeDiv = document.getElementById('trades');
+var rtPriceSp = document.getElementById('rt_price');
+var rtMedianSp = document.getElementById('rt_median');
+var timestampSp = document.getElementById('timestamp');
+
+ws.onmessage = function (event) {
+            var message = JSON.parse(event.data);
+<!--            console.log(message)-->
+
+            rtPriceSp.innerHTML = message.PRICE;
+            timestampSp.innerHTML = message.TIMESTAMP;
+            if (message.MEDIAN){
+                rtMedianSp.innerHTML = message.MEDIAN;
+            }
+
+            lineSeries.update({
+                time: message.TIMESTAMP_UNIX,
+                value: message.PRICE
+            })
+        }
+</script>
+</html>

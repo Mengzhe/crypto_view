@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time BTC Price</title>
+
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <script src="https://d3js.org/d3-color.v2.min.js"></script>
+    <script src="https://d3js.org/d3-format.v2.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
+    <script src="https://d3js.org/d3-time.v2.min.js"></script>
+    <script src="https://d3js.org/d3-time-format.v3.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v3.min.js"></script>
+    <script src="https://d3js.org/d3-selection.v2.min.js"></script>
+    <script src="https://d3js.org/d3-axis.v2.min.js"></script>
+    <script src="https://huww98.github.io/TimeChart/dist/timechart.min.js"></script>
+    <style>
+        #chart { width: 100%; height: 300px; margin-top: 50px; }
+    </style>
+</head>
+<body>
+<div id="trades">
+    <div>
+        <span> Real-Time BTC Price: </span>
+        <span id="rt_price"> </span>
+    </div>
+    <div>
+        <span> Aggregated Median Price: </span>
+        <span id="rt_median"> </span>
+    </div>
+    <div>
+        <span> Timestamp: </span>
+        <span id="timestamp"> </span>
+    </div>
+</div>
+<div id="chart"></div>
+<script>
+        var ws = new WebSocket("ws://localhost:8000/ws");
+        var tradeDiv = document.getElementById('trades');
+        var rtPriceSp = document.getElementById('rt_price');
+        var rtMedianSp = document.getElementById('rt_median');
+        var timestampSp = document.getElementById('timestamp');
+
+        const el = document.getElementById('chart');
+            const dataPoints = [];
+            const chart = new TimeChart(el, {
+                series: [{ data: dataPoints, name: 'Real-time price streaming', color: 'darkblue' }],
+                realTime: true,
+                xRange: { min: 0, max: 200 },
+            });
+
+        let x = 0;
+
+        ws.onmessage = function (event) {
+<!--            console.log(event.data);-->
+
+            var messageObject = JSON.parse(event.data);
+            rtPriceSp.innerHTML = messageObject.PRICE;
+            timestampSp.innerHTML = messageObject.TIMESTAMP;
+
+            x += 1
+            dataPoints.push({x, y: messageObject.PRICE});
+            chart.update();
+
+            if (messageObject.MEDIAN){
+                console.log(messageObject);
+                rtMedianSp.innerHTML = messageObject.MEDIAN;
+            }
+        }
+</script>
+</body>
+</html>
